@@ -1,21 +1,21 @@
-# README.txt
-# Author: Nicolas Loucheu - ULB (nicolas.loucheu@ulb.ac.be)
-# Date: 1st May 2020
 # README file for Sample_Analysis v0.02
+### Author: Nicolas Loucheu - ULB (nicolas.loucheu@ulb.ac.be)
+### Date: 1st May 2020
+
 
 The script executes some subscripts that generates graphs and data files needed for the report about the quality of Illumina Methylation 450k or EPIC blood samples based on their cellular proportions
 
-HOW TO USE IT
+## HOW TO USE IT
 
 In the bash pipeline file, change the "INPUT_FILE" variable name either to the .tar file containing the idats, the folder containing an idat folder with idats files, or a csv file with the cellular proportions of each sample.
 Also , you have to specify the platform used by changing the "PLATFORM" variable either to "450k" or "epic"
 
-DATA AVAILABLE
+## DATA AVAILABLE
 
 In the data folder are two directories with idat files. GSE110554_RAW contains EPIC data (Whole-blood from GSE110554) and GSETEST contains 450k data (Whole-blood samples from GSE88824).
 
 
-REQUIREMENTS
+## REQUIREMENTS
 
 This pipeline requires R and Python.
 
@@ -41,7 +41,7 @@ The modules used in Python are :
 7 - os
 8 - pickle
 
-SUBSCRIPTS
+## SUBSCRIPTS
 
 01 - load_csv.R
 
@@ -158,7 +158,7 @@ Generate csv files containing z-scores for each sample for each chromosome + csv
 
 
 
-OUTPUT
+## OUTPUT
 
 The name of the output is generated as folows : "Name of input file/folder"_"date(YYYYMMDD)"_"time(HHMM)"
 This folder contains all the graphs
