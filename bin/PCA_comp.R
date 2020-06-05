@@ -1,9 +1,9 @@
 # PCA_comp.R
 # Author: Nicolas Loucheu - ULB (nicolas.loucheu@ulb.ac.be)
-# Date: 1st May 2020
+# Date: 31st May 2020
 # Generate PCA predictions of new samples on the PCA graph from the control samples (from cell proportions)
 
-library(ggbiplot)
+library(ggplot2)
 
 args <- commandArgs()
 props <- read.csv(args[6], row.names = 1)
@@ -25,26 +25,6 @@ pred <- predict(props.pca, newdata = new_sample)
 pred <- as.data.frame(pred)
 rownames(pred) <- paste0("NEW_", c(1:length(pred$PC1)))
 
-# Plot the PCA
-pdf(paste0(out_folder, "/09_PCA_comp.pdf"))
-ggbiplot(props.pca, 
-         labels=rownames(props),
-         var.axes = FALSE) + 
-  theme(axis.text=element_text(size=10), 
-        axis.title=element_text(size=12,face="bold")) + 
-  labs(title = "PCA plot") +
-  geom_text(data = pred, 
-            mapping = aes(x=pred[,1], y=pred[,2]), 
-            label = rownames(pred), 
-            colour="red", 
-            vjust = "inward", 
-            hjust = "inward", 
-            size = 2.5) + 
-  xlim(min(-7, min(pred$PC1)), 
-       max(4, max(pred$PC1))) + 
-  ylim(min(-6.5, min(pred$PC2)), 
-       max(4.25, max(pred$PC2)))
-dev.off()
 
 # Save the coordinates of the PCA and the percentages of explained variance for each PC (PC_vect)
 predicted <- data.frame(pcax=pred$PC1, pcay=pred$PC2)
@@ -53,6 +33,18 @@ all_samples <- rbind(PCA_res, predicted)
 PC1 <- summary(props.pca)$importance[2]
 PC2 <- summary(props.pca)$importance[5]
 PC_vect <- c(PC1, PC2)
+
 write.csv(PC_vect, "tmp/PC_vect_comp.csv")
 write.csv(all_samples, "tmp/all_samples_comp.csv")
 write.csv(PCA_res, "tmp/PCA_res_comp.csv")
+
+
+#Plot with index of samples
+pdf(paste0(out_folder, "/09_PCA_comp.pdf"))
+ggplot(data = PCA_res, aes(x = pcax, y = pcay)) + 
+	geom_text(aes(label = rownames(PCA_res))) +
+	geom_text(data = predicted, mapping = aes(x=pcax, y=pcay), label = rownames(predicted), colour="red", vjust = "inward", hjust = "inward", size = 2.5) +
+	coord_fixed(ratio=1, xlim=range(pcax), ylim=range(pcay)) +
+	theme(axis.text=element_text(size=10), axis.title=element_text(size=12,face="bold")) + 
+	labs(title = "PCA plot", x = paste0("PC1: ", round(PC1*100, 2), "%"), y = paste0("PC2: ", round(PC2*100, 2), "%"))
+dev.off()

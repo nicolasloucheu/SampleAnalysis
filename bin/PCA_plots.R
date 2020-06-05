@@ -1,9 +1,9 @@
 # PCA_plots.R
 # Author: Nicolas Loucheu - ULB (nicolas.loucheu@ulb.ac.be)
-# Date: 30th April 2020
+# Date: 31st May 2020
 # PCA plot with cg probes as variables
 
-library(ggbiplot)
+library(ggplot2)
 library(data.table)
 args <- commandArgs()
 
@@ -23,7 +23,7 @@ cg.pca <- prcomp(series_matrix, center = TRUE)
 cg.pcax <- cg.pca$x[,1]
 cg.pcay <- cg.pca$x[,2]
 cg_PCA <- as.data.frame(cbind(cg.pcax, cg.pcay))
-rownames(cg_PCA) <- rownames(series_matrix)
+cg_PCA$sample_name <- rownames(series_matrix)
 write.csv(cg_PCA, file = "tmp/PCA_res.csv")
 
 PC1 <- summary(cg.pca)$importance[2]
@@ -36,10 +36,9 @@ rownames(series_matrix) <- NULL
 
 #Plot with index of samples
 pdf(paste0(out_folder, "/05_PCA_index.pdf"))
-ggbiplot(cg.pca, 
-         labels=rownames(series_matrix),
-         var.axes = FALSE) + 
-  theme(axis.text=element_text(size=10), 
-        axis.title=element_text(size=12,face="bold")) + 
-  labs(title = "PCA plot")
+ggplot(data = cg_PCA, aes(x = cg.pcax, y = cg.pcay)) + 
+	geom_text(aes(label = rownames(cg_PCA))) +
+	coord_fixed(ratio=1, xlim=range(cg_PCA$cg.pcax), ylim=range(cg_PCA$cg.pcay)) +
+	theme(axis.text=element_text(size=10), axis.title=element_text(size=12,face="bold")) + 
+	labs(title = "PCA plot", x = paste0("PC1: ", round(PC1*100, 2), "%"), y = paste0("PC2: ", round(PC2*100, 2), "%"))
 dev.off()

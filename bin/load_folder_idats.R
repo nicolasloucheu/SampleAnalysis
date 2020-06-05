@@ -21,9 +21,9 @@ if ("/idat" %in% folder){
 
 # From this RGChannelSet, get the cell proportions (code depends on platform)
 if (platform == 'epic'){
-	new_sample <- estimateCellCounts2(rgSet, referencePlatform="IlluminaHumanMethylationEPIC")
+	new_sample <- estimateCellCounts2(rgSet, referencePlatform="IlluminaHumanMethylationEPIC", probeSelect="IDOL", IDOLOptimizedCpGs=IDOLOptimizedCpGs)
 } else {
-	new_sample <- estimateCellCounts2(rgSet, referencePlatform="IlluminaHumanMethylation450k")
+	new_sample <- estimateCellCounts2(rgSet, referencePlatform="IlluminaHumanMethylation450k", probeSelect="IDOL", IDOLOptimizedCpGs=IDOLOptimizedCpGs450klegacy)
 }
 
 # Save these objects

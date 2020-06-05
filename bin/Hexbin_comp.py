@@ -1,12 +1,13 @@
 # Hexbin_comp.py
 # Author: Nicolas Loucheu - ULB (nicolas.loucheu@ulb.ac.be)
-# Date: 1st May 2020
+# Date: 30th May 2020
 # Hexbin of PCA comparison
 
 import sys
 import numpy as np
 import math
 import matplotlib.pyplot as plt
+import matplotlib.path as mplPath
 import pandas as pd
 
 points = pd.read_csv(sys.argv[1], index_col = 0)
@@ -41,39 +42,37 @@ ax = fig.add_subplot(111)
 # Set gridsize just to make them visually large
 image = plt.hexbin(x,y,cmap=color_map,gridsize=13,extent=extent,mincnt=1, bins = 'log')
 counts = image.get_array()
-ncnts = np.count_nonzero(np.power(10,counts))
 verts = image.get_offsets()
+paths = image.get_paths()
+
 for offc in range(verts.shape[0]):
-    binx,biny = verts[offc][0],verts[offc][1]
-    # If only one sample lies in the hexagon, annotate with its name (red if new sample, black otherwise)
-    if counts[offc] == 1:
-        best_dist = float("inf")
-        for i in range(len(points)):
-            dist = math.hypot(x[i]-binx, y[i]-biny)
-            if dist < best_dist:
-                best_dist = dist
-                best_index = i
-        plt.annotate(points.index[best_index], (binx, biny), ha='center', va = 'center', fontsize = 13, color = "k" if points.index[best_index] in map(str, list(control_points.index)) else "r", 
-                     weight = "normal" if points.index[best_index] in map(str, list(control_points.index)) else "bold")
+	current_center = verts[offc]
+	current_shape = mplPath.Path(paths[0].vertices + current_center)
+	if counts[offc] == 1:
+		for i in range(len(points)):
+			if current_shape.contains_point((x[i], y[i])):
+				plt.annotate(points.index[i], current_center, ha='center', va = 'center', fontsize = 13, 
+					color = "k" if points.index[i] in map(str, list(control_points.index)) else "r", 
+					weight = "normal" if points.index[i] in map(str, list(control_points.index)) else "bold")
+					
     # If two samples lie in the hexagon, annotate with their names (red if new sample, black otherwise)
-    if counts[offc] == 2:
-        best_dist = float("inf")
-        best_index = []
-        for i in range(len(points)):
-            dist = math.hypot(x[i]-binx, y[i]-biny)
-            if dist < best_dist:
-                best_dist = dist
-                best_index.append(i)
-        plt.annotate(points.index[best_index[-1]], (binx, biny+(leny/55.9)), ha='center', va = 'center', fontsize = 13, 
-                     color = "k" if points.index[best_index[-1]] in map(str, list(control_points.index)) else "r", 
-                     weight = "normal" if points.index[best_index[-1]] in map(str, list(control_points.index)) else "bold") 
-        plt.annotate(points.index[best_index[-2]], (binx, biny-(leny/55.9)), ha='center', va = 'center', fontsize = 13, 
-                     color = "k" if points.index[best_index[-2]] in map(str, list(control_points.index)) else "r", 
-                     weight = "normal" if points.index[best_index[-2]] in map(str, list(control_points.index)) else "bold") 
+	if counts[offc] == 2:
+		to_plot = []
+		for i in range(len(points)):
+			if current_shape.contains_point((x[i], y[i])):
+				to_plot.append(i)
+		plt.annotate(points.index[to_plot[0]], (current_center[0], current_center[1]+(leny/55.9)), ha='center', va = 'center', fontsize = 13, 
+			color = "k" if points.index[to_plot[0]] in map(str, list(control_points.index)) else "r", 
+			weight = "normal" if points.index[to_plot[0]] in map(str, list(control_points.index)) else "bold") 
+			
+		plt.annotate(points.index[to_plot[1]], (current_center[0], current_center[1]-(leny/55.9)), ha='center', va = 'center', fontsize = 13, 
+			color = "k" if points.index[to_plot[1]] in map(str, list(control_points.index)) else "r", 
+			weight = "normal" if points.index[to_plot[1]] in map(str, list(control_points.index)) else "bold") 
+			
 ax.set_xlim(xbnds)
 ax.set_ylim(ybnds)
-ax.set_xlabel(f"standardized PC1 ({PC_vect[0]} explained var.)", fontsize = 13)
-ax.set_ylabel(f"standardized PC2 ({PC_vect[1]} explained var.)", fontsize = 13)
+ax.set_xlabel(f"PC1 ({PC_vect[0]} explained var.)", fontsize = 13)
+ax.set_ylabel(f"PC2 ({PC_vect[1]} explained var.)", fontsize = 13)
 plt.grid(alpha = 0.5)
 cb = plt.colorbar(image, spacing='uniform', extend='max', format='%.0f')
 fig.savefig(str(out_folder)+"/10_hexbin_comp.pdf", bbox_inches="tight")

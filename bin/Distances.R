@@ -1,6 +1,6 @@
 # Distances.R
 # Author: Nicolas Loucheu - ULB (nicolas.loucheu@ulb.ac.be)
-# Date: 30th April 2020
+# Date: 31st May 2020
 # Compute distances between samples distributions and plot a heatmap
 
 library(philentropy)
@@ -53,8 +53,9 @@ frequencies <- sample_frequencies(series_matrix)
 dist_mat <- distance(frequencies, method = "euclidean")
 rownames(dist_mat) <- rownames(frequencies)
 colnames(dist_mat) <- rownames(frequencies)
+len_mat <- sqrt(length(dist_mat))/5
 
 # Creating HeatMap and saving it
-pdf(paste0(out_folder, "/07_HeatMap.pdf"))
-heatmap.2(dist_mat, col = bluered(100), trace = "none", density.info = "none", main = "HeatMap")
+pdf(paste0(out_folder, "/07_HeatMap.pdf"), width=20, height=20)
+heatmap.2(dist_mat, col = bluered(100), trace = "none", density.info = "none", main = "HeatMap", keysize=1, key.par = list(cex=1.5))
 dev.off()

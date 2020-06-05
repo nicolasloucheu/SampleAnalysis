@@ -12,7 +12,7 @@
 cd $PBS_O_WORKDIR 
 
 # Select data folder/file
-INPUT_FILE=data/GSETEST
+INPUT_FILE=data/GSE74432_RAW/
 # Select platform
 PLATFORM="450k"
 
