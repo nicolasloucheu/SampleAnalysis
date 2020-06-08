@@ -12,13 +12,19 @@ args <- commandArgs()
 
 rgSet <- readRDS(args[6])
 out_folder <- args[7]
+norm_meth <- args[8]
 
 # Preprocessing (MethylSet must be used for plotQC and 
 # densityPlot while RGChannelSet can be used for 
 # densityBeanPlot and further analysis)
 MSet <- preprocessRaw(rgSet)
 
-GRSet <- preprocessFunnorm(rgSet)
+if (norm_meth == "FunNorm"){
+	GRSet <- preprocessFunnorm(rgSet)
+} else {
+	GRSet <- preprocessQuantile(rgSet)
+}
+
 series_matrix <- data.frame(t(getBeta(GRSet)))
 series_matrix$row_name <- rownames(series_matrix)
 transposed_sm <- as.data.frame(t(series_matrix))

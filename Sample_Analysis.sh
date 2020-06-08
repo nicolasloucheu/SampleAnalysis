@@ -11,10 +11,16 @@
 
 cd $PBS_O_WORKDIR 
 
-# Select data folder/file
-INPUT_FILE=data/GSE74432_RAW/
-# Select platform
+# MODIFY THOSE LINES
+
+#Select input data
+INPUT_FILE=data/GSESOTOS/
+# Select platform ("450k" or "epic")
 PLATFORM="450k"
+# Select normalisation method ("FunNorm" or "Quantiles")
+NORM_METH="FunNorm"
+
+#STOP MODIFYING
 
 # Parse name of input
 BASE_NAME=$(basename $INPUT_FILE)
@@ -58,7 +64,7 @@ fi
 # See README.txt if you want to modify those lines
 if [ -f "tmp/rgSet" ] && [ -f "tmp/new_sample.csv" ]; then
 	Rscript bin/IDs_gen.R tmp/new_sample.csv $OUT_FOLDER
-	Rscript bin/QC_analysis.R tmp/rgSet $OUT_FOLDER
+	Rscript bin/QC_analysis.R tmp/rgSet $OUT_FOLDER $NORM_METH
 	Rscript bin/PCA_plots.R tmp/series_matrix.csv $OUT_FOLDER
 	python bin/Hexbin.py tmp/PCA_res.csv tmp/PC_vect.csv $OUT_FOLDER
 	Rscript bin/Distances.R tmp/series_matrix.csv $OUT_FOLDER
