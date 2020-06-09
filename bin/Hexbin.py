@@ -14,7 +14,10 @@ import pandas as pd
 # Import and format data
 points = pd.read_csv(sys.argv[1], index_col = 0).drop(["sample_name"], axis=1)
 PC_vect = pd.read_csv(sys.argv[2], index_col = 0)
-PC_vect = list(map(lambda x: str(round(x*100, 2))+"%", list(PC_vect["x"])))
+PC_num = list(PC_vect['x'])[0:2]
+PC_num = [int(x) for x in PC_num]
+PC_0 = list(PC_vect['x'])[2:4]
+PC_vect = list(map(lambda x: str(round(x*100, 2))+"%", PC_0))
 out_folder = sys.argv[3]
 color_map = plt.cm.viridis_r
 x = list(points["cg.pcax"])
@@ -57,8 +60,8 @@ for offc in range(verts.shape[0]):
 		plt.annotate(points.index[to_plot[1]], (current_center[0], current_center[1]-(leny/55.9)), ha='center', va = 'center', fontsize = 13, color = "k")
 ax.set_xlim(xbnds)
 ax.set_ylim(ybnds)
-ax.set_xlabel(f"PC1 ({PC_vect[0]} explained var.)", fontsize = 13)
-ax.set_ylabel(f"PC2 ({PC_vect[1]} explained var.)", fontsize = 13)
+ax.set_xlabel(f"PC{PC_num[0]} ({PC_vect[0]} explained var.)", fontsize = 13)
+ax.set_ylabel(f"PC{PC_num[1]} ({PC_vect[1]} explained var.)", fontsize = 13)
 plt.grid(alpha = 0.5)
 cb = plt.colorbar(image, spacing='uniform', extend='max', format='%1.2f')
 cb.update_ticks

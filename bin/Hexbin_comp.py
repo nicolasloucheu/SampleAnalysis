@@ -21,7 +21,10 @@ y = list(points["pcay"])
 
 # Get percentages of explained variance for each PC
 PC_vect = pd.read_csv(sys.argv[3], index_col = 0)
-PC_vect = list(map(lambda x: str(round(x*100, 2))+"%", list(PC_vect["x"])))
+PC_num = list(PC_vect['x'])[0:2]
+PC_num = [int(x) for x in PC_num]
+PC_0 = list(PC_vect['x'])[2:4]
+PC_vect = list(map(lambda x: str(round(x*100, 2))+"%", PC_0))
 
 out_folder = sys.argv[4]
 
@@ -71,8 +74,8 @@ for offc in range(verts.shape[0]):
 			
 ax.set_xlim(xbnds)
 ax.set_ylim(ybnds)
-ax.set_xlabel(f"PC1 ({PC_vect[0]} explained var.)", fontsize = 13)
-ax.set_ylabel(f"PC2 ({PC_vect[1]} explained var.)", fontsize = 13)
+ax.set_xlabel(f"PC{PC_num[0]} ({PC_vect[0]} explained var.)", fontsize = 13)
+ax.set_ylabel(f"PC{PC_num[1]} ({PC_vect[1]} explained var.)", fontsize = 13)
 plt.grid(alpha = 0.5)
 cb = plt.colorbar(image, spacing='uniform', extend='max', format='%.0f')
 fig.savefig(str(out_folder)+"/10_hexbin_comp.pdf", bbox_inches="tight")

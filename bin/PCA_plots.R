@@ -8,31 +8,28 @@ library(data.table)
 args <- commandArgs()
 
 out_folder <- args[7]
+PCA_X <- as.numeric(args[8])
+PCA_Y <- as.numeric(args[9])
 
-# Loading and transforming beta-values data
-series_matrix <- fread(args[6], header=TRUE)
-series_matrix <- na.omit(series_matrix)
-IDs <- series_matrix$row_name
-rownames(series_matrix) <- IDs
-series_matrix$row_name <- NULL
+# Loading and transforming cell proportions data
+new_sample <- fread(args[6], header=TRUE)
+new_sample$V1 <- NULL
+print(head(new_sample))
 
 # Doing the PCA
-cg.pca <- prcomp(series_matrix, center = TRUE)
+cg.pca <- prcomp(new_sample, center = TRUE)
 
 # Store the PCA data
-cg.pcax <- cg.pca$x[,1]
-cg.pcay <- cg.pca$x[,2]
+cg.pcax <- cg.pca$x[,PCA_X]
+cg.pcay <- cg.pca$x[,PCA_Y]
 cg_PCA <- as.data.frame(cbind(cg.pcax, cg.pcay))
-cg_PCA$sample_name <- rownames(series_matrix)
+cg_PCA$sample_name <- rownames(new_sample)
 write.csv(cg_PCA, file = "tmp/PCA_res.csv")
 
-PC1 <- summary(cg.pca)$importance[2]
-PC2 <- summary(cg.pca)$importance[5]
-PC_vect <- c(PC1, PC2)
+PC1 <- summary(cg.pca)$importance[(PCA_X*3)-1]
+PC2 <- summary(cg.pca)$importance[(PCA_Y*3)-1]
+PC_vect <- c(PCA_X, PCA_Y, PC1, PC2)
 write.csv(PC_vect, file = "tmp/PC_vect.csv")
-
-
-rownames(series_matrix) <- NULL
 
 #Plot with index of samples
 pdf(paste0(out_folder, "/05_PCA_index.pdf"))
@@ -40,5 +37,5 @@ ggplot(data = cg_PCA, aes(x = cg.pcax, y = cg.pcay)) +
 	geom_text(aes(label = rownames(cg_PCA))) +
 	coord_fixed(ratio=1, xlim=range(cg_PCA$cg.pcax), ylim=range(cg_PCA$cg.pcay)) +
 	theme(axis.text=element_text(size=10), axis.title=element_text(size=12,face="bold")) + 
-	labs(title = "PCA plot", x = paste0("PC1: ", round(PC1*100, 2), "%"), y = paste0("PC2: ", round(PC2*100, 2), "%"))
+	labs(title = "PCA plot", x = paste0("PC", PCA_X, ": ", round(PC1*100, 2), "%"), y = paste0("PC", PCA_Y, ": ", round(PC2*100, 2), "%"))
 dev.off()

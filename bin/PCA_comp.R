@@ -10,13 +10,17 @@ props <- read.csv(args[6], row.names = 1)
 new_sample <- read.csv(args[7], row.names = 1)
 rownames(props) <- NULL
 out_folder <- args[8]
+PCA_X <- as.numeric(args[9])
+PCA_Y <- as.numeric(args[10])
 
 # Compute PCA on controls
 props.pca <- prcomp(props, center=TRUE, scale.=TRUE)
+print(props)
+print(summary(props.pca)$importance)
 
 # Save coordinates
-pcax <- props.pca$x[,1]
-pcay <- props.pca$x[,2]
+pcax <- props.pca$x[,PCA_X]
+pcay <- props.pca$x[,PCA_Y]
 PCA_res <- as.data.frame(cbind(pcax, pcay))
 rownames(PCA_res) <- c(1:689)
 
@@ -30,9 +34,9 @@ rownames(pred) <- paste0("NEW_", c(1:length(pred$PC1)))
 predicted <- data.frame(pcax=pred$PC1, pcay=pred$PC2)
 rownames(predicted) <- rownames(pred)
 all_samples <- rbind(PCA_res, predicted)
-PC1 <- summary(props.pca)$importance[2]
-PC2 <- summary(props.pca)$importance[5]
-PC_vect <- c(PC1, PC2)
+PC1 <- summary(props.pca)$importance[(PCA_X*3)-1]
+PC2 <- summary(props.pca)$importance[(PCA_Y*3)-1]
+PC_vect <- c(PCA_X, PCA_Y, PC1, PC2)
 
 write.csv(PC_vect, "tmp/PC_vect_comp.csv")
 write.csv(all_samples, "tmp/all_samples_comp.csv")
@@ -46,5 +50,5 @@ ggplot(data = PCA_res, aes(x = pcax, y = pcay)) +
 	geom_text(data = predicted, mapping = aes(x=pcax, y=pcay), label = rownames(predicted), colour="red", vjust = "inward", hjust = "inward", size = 2.5) +
 	coord_fixed(ratio=1, xlim=range(pcax), ylim=range(pcay)) +
 	theme(axis.text=element_text(size=10), axis.title=element_text(size=12,face="bold")) + 
-	labs(title = "PCA plot", x = paste0("PC1: ", round(PC1*100, 2), "%"), y = paste0("PC2: ", round(PC2*100, 2), "%"))
+	labs(title = "PCA plot", x = paste0("PC", PCA_X,": ", round(PC1*100, 2), "%"), y = paste0("PC", PCA_Y,": ", round(PC2*100, 2), "%"))
 dev.off()

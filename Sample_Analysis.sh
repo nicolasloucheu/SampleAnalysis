@@ -11,16 +11,34 @@
 
 cd $PBS_O_WORKDIR 
 
-# MODIFY THOSE LINES
+"""
+#MODIFY THOSE LINES
+"""
 
 #Select input data
 INPUT_FILE=data/GSESOTOS/
+
 # Select platform ("450k" or "epic")
 PLATFORM="450k"
+
 # Select normalisation method ("FunNorm" or "Quantiles")
 NORM_METH="FunNorm"
 
+# Select the PCA components to put on the PCA graph made from sample cell proportions values (number between 1 and 8)
+# First (x-axis)
+FIRST_PCA=1
+# Second (y-axis)
+SECOND_PCA=2
+
+# Select the PCA components to put on the PCA graph made on the control cell proportions values (number between 1 and 8)
+# First (x-axis)
+FIRST_C_PCA=1
+# Second (y-axis)
+SECOND_C_PCA=2
+
+"""
 #STOP MODIFYING
+"""
 
 # Parse name of input
 BASE_NAME=$(basename $INPUT_FILE)
@@ -65,11 +83,11 @@ fi
 if [ -f "tmp/rgSet" ] && [ -f "tmp/new_sample.csv" ]; then
 	Rscript bin/IDs_gen.R tmp/new_sample.csv $OUT_FOLDER
 	Rscript bin/QC_analysis.R tmp/rgSet $OUT_FOLDER $NORM_METH
-	Rscript bin/PCA_plots.R tmp/series_matrix.csv $OUT_FOLDER
+	Rscript bin/PCA_plots.R tmp/new_sample.csv $OUT_FOLDER $FIRST_PCA $SECOND_PCA
 	python bin/Hexbin.py tmp/PCA_res.csv tmp/PC_vect.csv $OUT_FOLDER
 	Rscript bin/Distances.R tmp/series_matrix.csv $OUT_FOLDER
 	Rscript bin/boxplot_comp.R data/bin/proportions_output.csv tmp/new_sample.csv $OUT_FOLDER
-	Rscript bin/PCA_comp.R data/bin/proportions_output.csv tmp/new_sample.csv $OUT_FOLDER
+	Rscript bin/PCA_comp.R data/bin/proportions_output.csv tmp/new_sample.csv $OUT_FOLDER $FIRST_C_PCA $SECOND_C_PCA
 	python bin/Hexbin_comp.py tmp/all_samples_comp.csv tmp/PCA_res_comp.csv tmp/PC_vect_comp.csv $OUT_FOLDER
 	python bin/Violin.py tmp/new_sample.csv data/bin/proportions_output.csv $OUT_FOLDER
 	python bin/divide_samples.py tmp/tr_series_matrix.csv data/bin/hg38_manifest.csv $OUT_FOLDER
