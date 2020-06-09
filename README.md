@@ -9,7 +9,8 @@ The script executes some subscripts that generates graphs and data files needed 
 
 In the bash pipeline file, modify the fileds between "Modify those lines" and "Stop modifying". Set the "INPUT_FILE" variable name either to the .tar file containing the idats, the folder containing an idat folder with idats files, or a csv file with the cellular proportions of each sample.  
 Also , you have to specify the platform used by changing the "PLATFORM" variable either to "450k" or "epic".  
-You can also specify the normalization method used by specifying either "FunNorm" or "Quantiles for respectively functional normalization or quantile normalization.
+You can also specify the normalization method used by specifying either "FunNorm" or "Quantiles for respectively functional normalization or quantile normalization.  
+Finally, for each PCA done, you can choose wich principal components must be plotted. The input must be an integer between 1 and 6 (because there are 6 PCA variables, the 6 different cell types taken into account for the deconvolution).
 
 ## DATA AVAILABLE
 

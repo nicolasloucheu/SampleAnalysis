@@ -1,6 +1,6 @@
 # PCA_comp.R
 # Author: Nicolas Loucheu - ULB (nicolas.loucheu@ulb.ac.be)
-# Date: 31st May 2020
+# Date: 8th June 2020
 # Generate PCA predictions of new samples on the PCA graph from the control samples (from cell proportions)
 
 library(ggplot2)

@@ -1,6 +1,6 @@
 # Distances.R
 # Author: Nicolas Loucheu - ULB (nicolas.loucheu@ulb.ac.be)
-# Date: 31st May 2020
+# Date: 9th June 2020
 # Compute distances between samples distributions and plot a heatmap
 
 library(philentropy)
@@ -10,52 +10,17 @@ library(data.table)
 args <- commandArgs()
 
 #Import and formatting of beta-values
-series_matrix <- as.data.frame(fread(args[6], header=TRUE))
+m_matrix <- as.data.frame(fread(args[6], header=TRUE))
+rownames(m_matrix) <- m_matrix$cg_name
+m_matrix$cg_name <- NULL
+m_matrix <- do.call(data.frame, lapply(m_matrix, function(x) replace(x, is.infinite(x),0)))
+colnames(m_matrix) <- c(1:length(m_matrix))
+
 out_folder <- args[7]
-series_matrix <- na.omit(series_matrix)
-IDs <- series_matrix$row_name
-series_matrix$row_name <- NULL
-series_matrix <- as.data.frame(series_matrix)
 
-# Creating function to divide each sample beta-value distribution into 20 bins
-sample_frequencies <- function(x){
-  results_freq <- data.frame(row.names = rownames(x), 
-                             bin1 = rep(0, as.numeric(length(x[,1]))), 
-                             bin2 = rep(0, as.numeric(length(x[,1]))), 
-                             bin3 = rep(0, as.numeric(length(x[,1]))), 
-                             bin4 = rep(0, as.numeric(length(x[,1]))), 
-                             bin5 = rep(0, as.numeric(length(x[,1]))), 
-                             bin6 = rep(0, as.numeric(length(x[,1]))), 
-                             bin7 = rep(0, as.numeric(length(x[,1]))),
-                             bin8 = rep(0, as.numeric(length(x[,1]))), 
-                             bin9 = rep(0, as.numeric(length(x[,1]))), 
-                             bin10 = rep(0, as.numeric(length(x[,1]))),
-                             bin11 = rep(0, as.numeric(length(x[,1]))), 
-                             bin12 = rep(0, as.numeric(length(x[,1]))), 
-                             bin13 = rep(0, as.numeric(length(x[,1]))),
-                             bin14 = rep(0, as.numeric(length(x[,1]))), 
-                             bin15 = rep(0, as.numeric(length(x[,1]))), 
-                             bin16 = rep(0, as.numeric(length(x[,1]))), 
-                             bin17 = rep(0, as.numeric(length(x[,1]))), 
-                             bin18 = rep(0, as.numeric(length(x[,1]))), 
-                             bin19 = rep(0, as.numeric(length(x[,1]))), 
-                             bin20 = rep(0, as.numeric(length(x[,1]))))
-  for ( a in 1:length(x[,1])){
-    results_freq[a,] <- hist(as.numeric(x[a,]), breaks = 20)$counts
-  }
-  return(results_freq)
-}
-
-# Dividing each sample beta-value distribution into 20 bins
-frequencies <- sample_frequencies(series_matrix)
-
-# Computing the distance matrix from the bin frequencies for each sample
-dist_mat <- distance(frequencies, method = "euclidean")
-rownames(dist_mat) <- rownames(frequencies)
-colnames(dist_mat) <- rownames(frequencies)
-len_mat <- sqrt(length(dist_mat))/5
+cor_matrix <- cor(m_matrix)
 
 # Creating HeatMap and saving it
 pdf(paste0(out_folder, "/07_HeatMap.pdf"), width=20, height=20)
-heatmap.2(dist_mat, col = bluered(100), trace = "none", density.info = "none", main = "HeatMap", keysize=1, key.par = list(cex=1.5))
+heatmap.2(cor_matrix, col = bluered(100), trace = "none", density.info = "none", main = "HeatMap", keysize=1, key.par = list(cex=1.5))
 dev.off()

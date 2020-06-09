@@ -1,6 +1,6 @@
 # Hexbin.py
 # Author: Nicolas Loucheu - ULB (nicolas.loucheu@ulb.ac.be)
-# Date: 30th May 2020
+# Date: 8th June 2020
 # Creating Hexbin plot from PCA data
 
 import sys

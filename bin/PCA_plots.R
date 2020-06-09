@@ -1,6 +1,6 @@
 # PCA_plots.R
 # Author: Nicolas Loucheu - ULB (nicolas.loucheu@ulb.ac.be)
-# Date: 31st May 2020
+# Date: 8th June 2020
 # PCA plot with cg probes as variables
 
 library(ggplot2)
